@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Advanced Vulnerability Checker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">VulnGuard</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="vulnerability-rules.html">Vulnerability Rules</a>
+            <a href="help.html">Help</a>
+        </div>
+        <div class="user-account">
+            <img src="./profile.png" alt="Account" id="accountBtn">
+            <div class="account-dropdown">
+                <a href="./change-password.html">Change Password</a>
+                <a href="./login.html">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Advanced JavaScript Vulnerability Checker</h1>
+        <form id="codeForm">
+            <textarea id="codeInput" placeholder="Enter your JavaScript code here"></textarea>
+            <button type="submit">Check Vulnerabilities</button>
+            <button type="button" onclick="window.location.href='index.html'">Back</button>
+        </form>
+        <div id="result"></div>
+        <div id="charts-container">
+            <canvas id="xssChart"></canvas>
+            <canvas id="codeInjectionChart"></canvas>
+            <canvas id="sqlInjectionChart"></canvas>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerability Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">VulnGuard</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="vulnerability-rules.html">Vulnerability Rules</a>
+            <a href="help.html">Help</a>
+        </div>
+        <div class="user-account">
+            <img src="./profile.png" alt="Account" id="accountBtn">
+            <div class="account-dropdown">
+               
+                <a href="change-password.html">Change Password</a>
+                <a href="./login.html">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Welcome to the Advanced Vulnerability Checker Dashboard</h1>
+        
+        <section id="overview">
+            <h2>Overview of Vulnerabilities</h2>
+            <p>Understanding the potential threats to your JavaScript code is essential in maintaining robust security. Here’s a detailed look into the major vulnerabilities our software can detect:</p>
+        </section>
+
+        <section id="xss">
+            <h2>Cross-Site Scripting (XSS)</h2>
+            <p>XSS attacks allow attackers to inject malicious scripts into content from otherwise trusted websites. This can lead to various forms of data theft, site defacement, and the spread of malware.</p>
+            <ul>
+                <li><strong>Persistent XSS:</strong> Stores the malicious script in a database.</li>
+                <li><strong>Reflected XSS:</strong> Reflects the malicious script off a web server.</li>
+                <li><strong>DOM-based XSS:</strong> Executes the malicious script as part of the web page’s DOM.</li>
+            </ul>
+            <div class="chart-container">
+                <canvas id="xssChart"></canvas>
+            </div>
+        </section>
+
+        <section id="code-injection">
+            <h2>Code Injection</h2>
+            <p>Code injection involves an attacker injecting arbitrary code into a vulnerable software program. This code is then executed, leading to unauthorized actions or data theft.</p>
+            <ul>
+                <li><strong>Eval Injection:</strong> Exploits the use of the `eval` function.</li>
+                <li><strong>Function Constructor Injection:</strong> Abuses `new Function` constructor to execute arbitrary code.</li>
+            </ul>
+            <div class="chart-container">
+                <canvas id="codeInjectionChart"></canvas>
+            </div>
+        </section>
+
+        <section id="sql-injection">
+            <h2>SQL Injection</h2>
+            <p>SQL Injection vulnerabilities allow attackers to interfere with the queries your application makes to its database. This can lead to unauthorized access to data, and in severe cases, the complete compromise of the database.</p>
+            <ul>
+                <li>Bypassing authentication.</li>
+                <li>Accessing sensitive data.</li>
+                <li>Modifying or deleting data.</li>
+                <li>Executing administrative operations on the database.</li>
+            </ul>
+            <div class="chart-container">
+                <canvas id="sqlInjectionChart"></canvas>
+            </div>
+        </section>
+
+        <section id="detection">
+            <h2>How VulnGuard Works</h2>
+            <p>Our software utilizes advanced algorithms and pattern recognition techniques to scan your JavaScript code for vulnerabilities. Here’s how it helps you stay ahead of potential security threats:</p>
+            <ul>
+                <li><strong>Pattern Matching:</strong> Identifies common vulnerability patterns in your code.</li>
+                <li><strong>Heuristic Analysis:</strong> Analyzes code behavior to detect anomalies.</li>
+                <li><strong>Real-time Reporting:</strong> Provides instant feedback on detected vulnerabilities.</li>
+            </ul>
+            <p>With VulnGuard, you can confidently step ahead of security threats, ensuring your applications are secure and reliable.</p>
+        </section>
+
+        <button onclick="window.location.href='vuln_check.html'" class="check-tool-btn">Explore Vulnerability Checker</button>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
