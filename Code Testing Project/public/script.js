@@ -35,35 +35,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayResults(result) {
+        const resultDiv = document.getElementById('result');
         resultDiv.innerHTML = '<h2>Vulnerability Analysis:</h2>';
-
-        const vulnerabilityCategories = ['XSS', 'CodeInjection', 'SQLInjection'];
-
-        vulnerabilityCategories.forEach(category => {
-            const categoryData = result[category] || { vulnerable: '0.0', issues: [] };
-            const percentage = parseFloat(categoryData.vulnerable || '0.0');
-
-            resultDiv.innerHTML += `
-                <div class="vulnerability-category">
-                    <h3>${category} (${percentage.toFixed(1)}%):</h3>
-                    <div class="chart-container">
-                        <div class="chart" style="width: ${percentage}%;"></div>
-                    </div>
-                    <ul class="vulnerability-list">
-                        ${categoryData.issues.length > 0 
-                            ? categoryData.issues.map(vuln => `<li>${vuln}</li>`).join('') 
-                            : '<li>No vulnerabilities detected</li>'}
-                    </ul>
-                </div>`;
+      
+        Object.keys(result).forEach(category => {
+          const categoryData = result[category];
+          const totalRules = categoryData.issues.length > 0 ? 15 : 0; // Adjust this based on your total rules setup
+      
+          const percentage = totalRules > 0 ? ((categoryData.issues.length / totalRules) * 100).toFixed(2) : 0;
+      
+          resultDiv.innerHTML += `
+            <div class="vulnerability-category">
+              <h3>${category} (${percentage}%):</h3>
+              <div class="chart-container">
+                <div class="chart" style="width: ${percentage}%;"></div>
+              </div>
+              <ul class="vulnerability-list">
+                ${categoryData.issues.length > 0
+                  ? categoryData.issues.map(vuln => `<li>${vuln}</li>`).join('')
+                  : '<li>No vulnerabilities detected</li>'}
+              </ul>
+            </div>`;
+       
+      
+            // Debugging: Log the category data and calculated percentage
+            console.log(`Category: ${category}, Total Rules: ${totalRules}, Percentage: ${percentage}`);
         });
-
+    
         renderCharts(result);
     }
-
+    
+    
     function renderCharts(result) {
         const xssVulnerable = parseFloat(result.XSS?.vulnerable || '0.0');
         const codeInjectionVulnerable = parseFloat(result.CodeInjection?.vulnerable || '0.0');
         const sqlInjectionVulnerable = parseFloat(result.SQLInjection?.vulnerable || '0.0');
+        const authVulnerable = parseFloat(result.Authentication?.vulnerable || '0.0');
 
         const xssChart = new Chart(document.getElementById('xssChart'), {
             type: 'bar',
@@ -118,6 +125,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     data: [sqlInjectionVulnerable],
                     backgroundColor: 'rgba(155, 89, 182, 0.2)',
                     borderColor: 'rgba(155, 89, 182, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        const authChart = new Chart(document.getElementById('authChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Authentication'],
+                datasets: [{
+                    label: 'Authentication Vulnerabilities',
+                    data: [authVulnerable],
+                    backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                    borderColor: 'rgba(46, 204, 113, 1)',
                     borderWidth: 1
                 }]
             },

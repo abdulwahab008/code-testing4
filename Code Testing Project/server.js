@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 4000;
-const JWT_SECRET = 'your_jwt_secret'; // Replace with your JWT secret
+const JWT_SECRET = 'your_jwt_secret'; 
 
 // MySQL connection configuration
 const dbConfig = {
@@ -28,8 +28,6 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-
-
 app.post('/api/check', (req, res) => {
     console.log('Request received:', req.body);
     const code = req.body.code;
@@ -42,140 +40,177 @@ app.post('/api/check', (req, res) => {
 
 function checkVulnerabilities(code) {
   const vulnerabilities = {
-      XSS: [],
-      CodeInjection: [],
-      SQLInjection: []
+    XSS: [],
+    CodeInjection: [],
+    SQLInjection: [],
+    Authentication: []
   };
+
+  // Total number of rules for each type
+  const totalRules = {
+    XSS: 15,
+    CodeInjection: 11,
+    SQLInjection: 12,
+    Authentication: 6
+  };
+
+  // Log the initial total rules
+  console.log('Total Rules:', totalRules);
+
+
 
   // XSS Checks
   if (/innerHTML\s*=\s*/.test(code) || /outerHTML\s*=\s*/.test(code)) {
-      vulnerabilities.XSS.push('Use of innerHTML/outerHTML');
+    vulnerabilities.XSS.push('Use of innerHTML/outerHTML');
   }
   if (/document\.write\s*\(/.test(code)) {
-      vulnerabilities.XSS.push('Use of document.write()');
+    vulnerabilities.XSS.push('Use of document.write()');
   }
   if (/<script>.*<\/script>/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS with inline scripts');
+    vulnerabilities.XSS.push('Potential XSS with inline scripts');
   }
   if (/(<.*script.*>)/i.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from user input with script tags');
+    vulnerabilities.XSS.push('Potential XSS from user input with script tags');
   }
   const locationHrefRegex = /location\.href\s*=\s*['"]([^'"]+)['"]/;
   const locationHrefMatches = code.match(locationHrefRegex);
   if (locationHrefMatches) {
-      const assignment = locationHrefMatches[1];
-      if (!/^\/[^\/].*/.test(assignment) && !/^\.\//.test(assignment)) {
-          vulnerabilities.XSS.push('Potential XSS from location.href assignment');
-      }
+    const assignment = locationHrefMatches[1];
+    if (!/^\/[^\/].*/.test(assignment) && !/^\.\//.test(assignment)) {
+      vulnerabilities.XSS.push('Potential XSS from location.href assignment');
+    }
   }
   if (/window\.location\s*=\s*/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from window.location assignment');
+    vulnerabilities.XSS.push('Potential XSS from window.location assignment');
   }
   if (/onerror\s*=\s*/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from onerror attribute');
+    vulnerabilities.XSS.push('Potential XSS from onerror attribute');
   }
   if (/onload\s*=\s*/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from onload attribute');
+    vulnerabilities.XSS.push('Potential XSS from onload attribute');
   }
   if (/srcdoc\s*=\s*/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from srcdoc attribute');
+    vulnerabilities.XSS.push('Potential XSS from srcdoc attribute');
   }
-  if (/javascripts:/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from javascripts: URL scheme');
+  if (/javascript:/.test(code)) {
+    vulnerabilities.XSS.push('Potential XSS from javascript: URL scheme');
   }
   if (/document\.URL\s*=\s*/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from document.URL assignment');
+    vulnerabilities.XSS.push('Potential XSS from document.URL assignment');
   }
   if (/innerHTML\s*\+=\s*/.test(code)) {
-      vulnerabilities.XSS.push('Potential XSS from concatenation with innerHTML');
+    vulnerabilities.XSS.push('Potential XSS from concatenation with innerHTML');
   }
 
   // Code Injection Checks
   if (/eval\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of eval()');
+    vulnerabilities.CodeInjection.push('Use of eval()');
   }
   if (/new Function\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of new Function()');
+    vulnerabilities.CodeInjection.push('Use of new Function()');
   }
   if (/setTimeout\s*\(\s*.*\s*,\s*.*\s*\)/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of setTimeout with dynamic code');
+    vulnerabilities.CodeInjection.push('Use of setTimeout with dynamic code');
   }
   if (/setInterval\s*\(\s*.*\s*,\s*.*\s*\)/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of setInterval with dynamic code');
+    vulnerabilities.CodeInjection.push('Use of setInterval with dynamic code');
   }
   if (/exec\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of exec() in server-side code');
+    vulnerabilities.CodeInjection.push('Use of exec() in server-side code');
   }
   if (/spawn\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of spawn() in server-side code');
+    vulnerabilities.CodeInjection.push('Use of spawn() in server-side code');
   }
   if (/require\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of require() in server-side code');
+    vulnerabilities.CodeInjection.push('Use of require() in server-side code');
   }
   if (/import\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of import() in server-side code');
+    vulnerabilities.CodeInjection.push('Use of import() in server-side code');
   }
   if (/process\.exec\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of process.exec() in server-side code');
+    vulnerabilities.CodeInjection.push('Use of process.exec() in server-side code');
   }
   if (/child_process\.exec\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of child_process.exec() in server-side code');
+    vulnerabilities.CodeInjection.push('Use of child_process.exec() in server-side code');
   }
   if (/child_process\.spawn\s*\(/.test(code)) {
-      vulnerabilities.CodeInjection.push('Use of child_process.spawn() in server-side code');
+    vulnerabilities.CodeInjection.push('Use of child_process.spawn() in server-side code');
   }
 
   // SQL Injection Checks
   if (/SELECT\s+.*\s+FROM\s+.*\s+WHERE\s+.*=/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with SELECT statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with SELECT statement');
   }
   if (/INSERT\s+INTO\s+.*\s+VALUES\s*\(.*\)/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with INSERT statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with INSERT statement');
   }
   if (/UPDATE\s+.*\s+SET\s+.*\s+WHERE\s+.*=/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with UPDATE statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with UPDATE statement');
   }
   if (/DELETE\s+FROM\s+.*\s+WHERE\s+.*=/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with DELETE statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with DELETE statement');
   }
   if (/DROP\s+TABLE\s+.*;/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with DROP statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with DROP statement');
   }
   if (/ALTER\s+TABLE\s+.*\s+ADD\s+/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with ALTER statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with ALTER statement');
   }
   if (/CREATE\s+TABLE\s+.*\s*\(.*\)/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with CREATE statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with CREATE statement');
   }
   if (/UNION\s+SELECT\s+.*\s+FROM\s+.*;/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with UNION SELECT statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with UNION SELECT statement');
   }
   if (/EXEC\s+.*\s*\(.*\)/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with EXEC statement');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with EXEC statement');
   }
   if (/CONCAT\s*\(.*\)/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with CONCAT function');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with CONCAT function');
   }
   if (/CAST\s*\(.*\)/.test(code)) {
-      vulnerabilities.SQLInjection.push('Potential SQL Injection with CAST function');
+    vulnerabilities.SQLInjection.push('Potential SQL Injection with CAST function');
+  }
+
+  // Authentication Vulnerability Checks
+  if (/jwt\.sign\s*\(.*,\s*['"`](.*)['"`]\s*,/.test(code)) {
+    vulnerabilities.Authentication.push('Potential hardcoded JWT secret');
+  }
+  if (/bcrypt\.hashSync\s*\(.*,\s*['"`](.*)['"`]\s*\)/.test(code)) {
+    vulnerabilities.Authentication.push('Potential hardcoded salt in bcrypt hash');
+  }
+  if (/password\s*=\s*['"`](.*)['"`]/.test(code)) {
+    vulnerabilities.Authentication.push('Potential hardcoded password');
+  }
+  if (/\/auth\/login/.test(code) && !/rateLimit/.test(code)) {
+    vulnerabilities.Authentication.push('No rate limiting on login endpoint');
+  }
+  if (/\bpassword\b/.test(code) && !/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])/.test(code)) {
+    vulnerabilities.Authentication.push('Weak password policy');
+  }
+  if (/location\.search\s*=\s*['"`](.*)['"`]/.test(code)) {
+    vulnerabilities.Authentication.push('Sensitive data in URL');
   }
 
   return {
-      XSS: {
-          vulnerable: vulnerabilities.XSS.length > 0 ? '100.0' : '0.0',
-          issues: vulnerabilities.XSS
-      },
-      CodeInjection: {
-          vulnerable: vulnerabilities.CodeInjection.length > 0 ? '100.0' : '0.0',
-          issues: vulnerabilities.CodeInjection
-      },
-      SQLInjection: {
-          vulnerable: vulnerabilities.SQLInjection.length > 0 ? '100.0' : '0.0',
-          issues: vulnerabilities.SQLInjection
-      }
+    XSS: {
+      vulnerable: totalRules.XSS > 0 ? (vulnerabilities.XSS.length / totalRules.XSS) * 100 : 0,
+      issues: vulnerabilities.XSS
+    },
+    CodeInjection: {
+      vulnerable: totalRules.CodeInjection > 0 ? (vulnerabilities.CodeInjection.length / totalRules.CodeInjection) * 100 : 0,
+      issues: vulnerabilities.CodeInjection
+    },
+    SQLInjection: {
+      vulnerable: totalRules.SQLInjection > 0 ? (vulnerabilities.SQLInjection.length / totalRules.SQLInjection) * 100 : 0,
+      issues: vulnerabilities.SQLInjection
+    },
+    Authentication: {
+      vulnerable: totalRules.Authentication > 0 ? (vulnerabilities.Authentication.length / totalRules.Authentication) * 100 : 0,
+      issues: vulnerabilities.Authentication
+    }
   };
 }
-
 
 // Auth Routes
 app.post('/api/auth/signup', async (req, res) => {
